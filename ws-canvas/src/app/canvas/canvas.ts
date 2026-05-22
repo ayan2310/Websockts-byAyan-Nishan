@@ -1,5 +1,5 @@
 import {Component, ElementRef, inject, ViewChild} from '@angular/core';
-import {DrawData, DrawSocketService} from '../draw-socket.service';
+
 
 @Component({
   selector: 'app-canvas',
@@ -9,7 +9,9 @@ import {DrawData, DrawSocketService} from '../draw-socket.service';
 })
 export class Canvas {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
-  private socketService = inject(DrawSocketService);
+
+  // TODO: inject DrawSocketService
+
   private ctx!: CanvasRenderingContext2D;
   private isDrawing = false;
   private lastX = 0;
@@ -19,13 +21,8 @@ export class Canvas {
     this.ctx = this.canvasRef.nativeElement.getContext('2d')!;
     window.addEventListener('mouseup', () => this.isDrawing = false);
 
-    this.socketService.getMessages().subscribe({
-      next: (data: DrawData) => {
-        this.renderLine(data.x1, data.y1, data.x2, data.y2, '#00aeff');
-      },
-      error: (err) => console.error('WebSocket Error:', err),
-      complete: () => console.warn('WebSocket connection closed cleanly.')
-    });
+    // TODO: subscribe to incoming messages and call
+    // this.renderLine(data.x1, data.y1, data.x2, data.y2, '#00aeff')
   }
 
   startDrawing(e: MouseEvent) {
@@ -37,11 +34,11 @@ export class Canvas {
     if (!this.isDrawing) return;
     const currentX = e.offsetX;
     const currentY = e.offsetY;
+
     this.renderLine(this.lastX, this.lastY, currentX, currentY, '#ff0055');
-    this.socketService.sendMessage({
-      x1: this.lastX, y1: this.lastY,
-      x2: currentX, y2: currentY
-    });
+
+    // TODO: send the coordinates via the socket service
+
     [this.lastX, this.lastY] = [currentX, currentY];
   }
 
